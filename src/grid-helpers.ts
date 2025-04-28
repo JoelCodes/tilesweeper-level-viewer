@@ -1,4 +1,4 @@
-import { LevelTile, TileDef } from "./types";
+import { LevelTile, SweeperLevel, TileDef } from "./types";
 
 export function getId(i: number) {
   const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
@@ -25,4 +25,33 @@ export function setNeighbors(tiles: TileDef[], areNeighbors: (a: TileDef, b: Til
   });
   
   return Object.fromEntries(uniqTiles.map(tile => [tile.id, tile]));
+}
+
+export type Reducer<A, B> = (acc: A, tile: B) => A;
+export function makeLevel(
+  tiles: TileDef[], 
+  rest: Pick<SweeperLevel, 'name' | 'mines'|'xDim' | 'yDim'>, 
+  reducer:Reducer<Record<`m${'ax'|'in'}${'X'|'Y'}`, number>, TileDef>,
+  areNeighbors: (a: TileDef, b: TileDef) => boolean
+) : SweeperLevel{
+  const {maxX, maxY, minX, minY} = tiles.reduce(reducer, {maxX: -Infinity, maxY: -Infinity, minX: Infinity, minY: Infinity});
+  const width = (Math.abs(maxX - minX) + 2) * rest.xDim;
+  const height = (Math.abs(maxY - minY) + 2) * rest.yDim;
+  
+  return {
+    ...rest,
+    width,
+    height,
+    tiles: setNeighbors(tiles, areNeighbors),
+  }
+}
+
+export function translate({x = 0, y = 0}:{x?:number, y?:number}){
+  return function(tileDef:TileDef){
+    return {
+      ...tileDef,
+      cx: tileDef.cx + x,
+      cy: tileDef.cy + y,
+    }
+  }
 }

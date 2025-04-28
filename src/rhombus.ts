@@ -1,4 +1,4 @@
-import { setNeighbors } from "./grid-helpers";
+import { makeLevel, setNeighbors } from "./grid-helpers";
 import { SweeperLevel, TileDef } from "./types";
 
 export function rhombusNeighbors(_tileA: TileDef, _tileB: TileDef):boolean{
@@ -66,20 +66,6 @@ function maxDimReducer({maxX, maxY, minX, minY}: {maxX: number, maxY: number, mi
   }
 }
 
-function makeLevel(tiles: TileDef[], rest: Pick<SweeperLevel, 'name' | 'mines'>):SweeperLevel{
-  const {maxX, maxY, minX, minY} = tiles.reduce(maxDimReducer, {maxX: -Infinity, maxY: -Infinity, minX: Infinity, minY: Infinity});
-  const width = (Math.abs(maxX - minX) + 1) * baseRhombusLevel.xDim;
-  const height = (Math.abs(maxY - minY) + 1) * baseRhombusLevel.yDim;
-  
-  return {
-    ...baseRhombusLevel,
-    ...rest,
-    width,
-    height,
-    tiles: setNeighbors(tiles, rhombusNeighbors),
-  }
-}
-
 const rhombus1Tiles:TileDef[] = [
   ...flowerOfFlowers.map(tile => ({...tile, cy: tile.cy + 4, cx: tile.cx - 3})),
   ...flowerOfFlowers.map(tile => ({...tile, cy: tile.cy + 4, cx: tile.cx + 3})),
@@ -90,7 +76,8 @@ const rhombus1Tiles:TileDef[] = [
 export const rhombus1:SweeperLevel = makeLevel(rhombus1Tiles, {
   name: 'Rhombus1',
   mines: 20,
-});
+  ...baseRhombusLevel
+}, maxDimReducer, rhombusNeighbors);
 
 const rhombus2Tiles:TileDef[] = [
   ...flowerOfFlowers.map(tile => ({...tile, cy: tile.cy + 4, cx: tile.cx - 6})),
@@ -110,6 +97,7 @@ const rhombus2Tiles:TileDef[] = [
 export const rhombus2:SweeperLevel = makeLevel(rhombus2Tiles, {
   name: 'Rhombus2',
   mines: 40,
-});
+  ...baseRhombusLevel
+}, maxDimReducer, rhombusNeighbors);
 
 console.log(rhombus2)
