@@ -1,10 +1,15 @@
+## Tilesweeper Level Viewer
+
+This is a project designed to help me create levels for my upcoming Mobile game.
+
+![Screenshot of the app](./public/level-sweeper.png)
+
 ## Usage
 
 ```bash
 $ npm install # or pnpm install or yarn install
 ```
 
-### Learn more on the [Solid Website](https://solidjs.com) and come chat with us on our [Discord](https://discord.com/invite/solidjs)
 
 ## Available Scripts
 

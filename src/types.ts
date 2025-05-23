@@ -1,4 +1,4 @@
-export type TileType = 'rhombus' | 'dpad' | 'hex' | 'eqTri'
+export type TileType = 'rhombus' | 'octostar' | 'ossquare' | 'oshouse' 
 
 export type TileDef = {
   cx: number;

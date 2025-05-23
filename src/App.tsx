@@ -1,16 +1,20 @@
 import { createEffect, createSignal, For, on, Show } from 'solid-js';
-import { SweeperLevel } from './types';
+import { SweeperLevel, TileType } from './types';
 import { rhombus1, rhombus2 } from './rhombus';
 import classNames from 'classnames';
-import { dpad1 } from './dpad';
+import { octostar1 } from './octostar';
 
-const levels:SweeperLevel[] = [rhombus1, rhombus2, dpad1];
+const levels:SweeperLevel[] = [rhombus1, rhombus2, octostar1];
 
-const rhombusPoints = [-50, 0, 0, 86.602, 50, 0, 0, -86.602].join(' ');
-const dpadPoints = [-50, -25, -50, 75, 50, 75, 50, -25, 0, -75].join(' ');
+const tilePoints:Record<TileType, number[]> = {
+  rhombus: [-50, 0, 0, 86.602, 50, 0, 0, -86.602],
+  octostar: [0,-41.4213562373095,-12.132034355964255,-29.28932188134524,-29.28932188134524,-29.28932188134524,-29.28932188134524,-12.132034355964255,-41.4213562373095,0,-29.28932188134524,12.132034355964255,-29.28932188134524,29.28932188134524,-12.132034355964255,29.28932188134524,0,41.4213562373095,12.132034355964255,29.28932188134524,29.28932188134524,29.28932188134524,29.28932188134524,12.132034355964255,41.4213562373095,0,29.28932188134524,-12.132034355964255,29.28932188134524,-29.28932188134524,12.132034355964255,-29.28932188134524],
+  oshouse: [-20.71067811865476,-20.71067811865476,-20.71067811865476,-37.86796564403574,-8.578643762690497,-50,20.71067811865476,-20.71067811865476,20.71067811865476,20.71067811865476,-20.71067811865476,20.71067811865476,-50,-8.578643762690497,-37.86796564403574,-20.71067811865476],
+  ossquare: [0,29.28932188134524,29.28932188134524,0,0,-29.28932188134524,-29.28932188134524,0],
+}
 
 export default function App(){
-  const [active, setActive] = createSignal<SweeperLevel>(dpad1);
+  const [active, setActive] = createSignal<SweeperLevel>(octostar1);
 
   return <div>
     <h1 class='text-3xl font-bold text-center py-4'>Sweeper Levels</h1>
@@ -27,7 +31,7 @@ export default function App(){
           <svg viewBox="-200 -200 400 400" class='w-full'>
             <For each={Object.values(tiles)}>
               {({cx, cy, rotation, type}) => {
-                const points = type === 'rhombus' ? rhombusPoints : dpadPoints
+                const points = tilePoints[type].join(' ')
                 return <g style={{transform: `translate(${cx * xDim}px, ${cy * yDim}px) rotate(${rotation}deg) `}}>
                   <polygon points={points} fill='blue' stroke='black' stroke-width='10'/>
                 </g>
@@ -64,11 +68,15 @@ function ActiveLevel(props:{level:SweeperLevel}){
     console.log('Resetting active tiles');
     setActiveTiles([]);
   }, { defer: true }));
-
-  return <svg viewBox={`${-props.level.width / 2} ${-props.level.height / 2} ${props.level.width} ${props.level.height}`}>
+  const viewBox = () => {
+    const width = props.level.width * props.level.xDim;
+    const height = props.level.height * props.level.yDim;
+    return `${-width / 2} ${-height / 2} ${width} ${height}`;
+  }
+  return <svg viewBox={viewBox()} class='w-full h-full'>
     <For each={Object.values(props.level.tiles)}>
       {({ id, cx, cy, rotation, type, neighbors}) => {
-        const points = type === 'rhombus' ? rhombusPoints : dpadPoints
+        const points = tilePoints[type].join(' ')
         return <g on:click={() => setActiveTiles([id, ...neighbors])} style={{transform: `translate(${cx * props.level.xDim}px, ${cy * props.level.yDim}px) rotate(${rotation}deg) `}}>
           <polygon points={points} fill={activeTiles().includes(id) ? 'blue': '#ddd'} stroke='black' stroke-width='2'/>
         </g>

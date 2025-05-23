@@ -35,8 +35,8 @@ export function makeLevel(
   areNeighbors: (a: TileDef, b: TileDef) => boolean
 ) : SweeperLevel{
   const {maxX, maxY, minX, minY} = tiles.reduce(reducer, {maxX: -Infinity, maxY: -Infinity, minX: Infinity, minY: Infinity});
-  const width = (Math.abs(maxX - minX) + 2) * rest.xDim;
-  const height = (Math.abs(maxY - minY) + 2) * rest.yDim;
+  const width = (Math.abs(maxX - minX) + 2);
+  const height = (Math.abs(maxY - minY) + 2);
   
   return {
     ...rest,
